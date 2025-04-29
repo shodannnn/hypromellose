@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Access Token Captured</title>
+</head>
+<body>
+  <h1>Captured Access Token!</h1>
+
+  <script>
+    const hash = window.location.hash.substring(1);
+    const params = new URLSearchParams(hash);
+    const accessToken = params.get('access_token');
+
+    if (accessToken) {
+      console.log("Access Token:", accessToken);
+      document.write("<p><b>Access Token:</b> " + accessToken + "</p>");
+    } else {
+      document.write("<p><b>No access token found!</b></p>");
+    }
+  </script>
+
+</body>
+</html>
